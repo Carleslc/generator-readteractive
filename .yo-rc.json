@@ -1,0 +1,9 @@
+{
+  "generator-node": {
+    "promptValues": {
+      "authorName": "Carlos Lázaro Costa",
+      "authorEmail": "lazaro.costa.carles@gmail.com",
+      "authorUrl": "https://carleslc.me"
+    }
+  }
+}
