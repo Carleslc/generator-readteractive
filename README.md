@@ -1,6 +1,6 @@
 # Readteractive Generator
 
-![CLI](cli)
+![CLI](https://img.shields.io/badge/CLI-readteractive--generator-blue.svg)
 
 > A yeoman generator for scaffolding Readteractive books.
 
@@ -10,7 +10,7 @@ The [Readteractive structure](https://github.com/Carleslc/Readteractive/readtera
 
 It also provides a tool for **visualization** of your book with current chapters and the links between them, so you can have a general overview of the **narrative branches** of your book.
 
-<img href="http://yeoman.io/static/yeoman-character-sticker.51cef7e007.png" style='align: center'></img>
+<p align="center"><img src="http://yeoman.io/static/yeoman-character-sticker.51cef7e007.png" ></p>
 
 ## Installation
 
@@ -39,15 +39,13 @@ yo readteractive:book
 
 ### TODO
 
-![In development](todo)
+![In development](https://img.shields.io/badge/status-in%20development-red.svg)
 
 - Chapter scaffolding: Generate a new chapter.
 - Build: Builds your book 
 - Chapter ID rename: Rename a chapter ID.
 - Book graph visualization: Shows a graph of your book with current chapters and the links between them.
 
-[todo]: https://img.shields.io/badge/status-in%20development-red.svg
-[cli]: https://img.shields.io/badge/CLI-readteractive--generator-blue.svg
 [npm-image]: https://badge.fury.io/js/generator-readteractive.svg
 [npm-url]: https://npmjs.org/package/generator-readteractive
 [travis-image]: https://travis-ci.org/Carleslc/generator-readteractive.svg?branch=master
