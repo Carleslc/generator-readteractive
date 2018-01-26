@@ -1,5 +1,16 @@
-# generator-readteractive [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url] [![Coverage percentage][coveralls-image]][coveralls-url]
+# Readteractive Generator
+
+![CLI](cli)
+
 > A yeoman generator for scaffolding Readteractive books.
+
+We provide a _command line interface_ to easily generate your project doing **scaffolding**, so you do not need to remember the syntax of each file and you can just **focus on writing**.
+
+The [Readteractive structure](https://github.com/Carleslc/Readteractive/readteractive-structure) and files can be automatically generated using this CLI for your custom book.
+
+It also provides a tool for **visualization** of your book with current chapters and the links between them, so you can have a general overview of the **narrative branches** of your book.
+
+<img href="http://yeoman.io/static/yeoman-character-sticker.51cef7e007.png" style='align: center'></img>
 
 ## Installation
 
@@ -10,24 +21,33 @@ npm install -g yo
 npm install -g generator-readteractive
 ```
 
-Then generate your new project:
+Then run the wizard and it will guide you:
 
 ```bash
 yo readteractive
 ```
 
-## Getting To Know Yeoman
+## Features
 
- * Yeoman has a heart of gold.
- * Yeoman is a person with feelings and opinions, but is very easy to work with.
- * Yeoman can be too opinionated at times but is easily convinced not to be.
- * Feel free to [learn more about Yeoman](http://yeoman.io/).
+### Book scaffolding
 
-## License
+Generate a new book.
 
-MIT © [Carlos Lázaro Costa](https://carleslc.me)
+```
+yo readteractive:book
+```
 
+### TODO
 
+![In development](todo)
+
+- Chapter scaffolding: Generate a new chapter.
+- Build: Builds your book 
+- Chapter ID rename: Rename a chapter ID.
+- Book graph visualization: Shows a graph of your book with current chapters and the links between them.
+
+[todo]: https://img.shields.io/badge/status-in%20development-red.svg
+[cli]: https://img.shields.io/badge/CLI-readteractive--generator-blue.svg
 [npm-image]: https://badge.fury.io/js/generator-readteractive.svg
 [npm-url]: https://npmjs.org/package/generator-readteractive
 [travis-image]: https://travis-ci.org/Carleslc/generator-readteractive.svg?branch=master

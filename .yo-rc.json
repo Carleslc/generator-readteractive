@@ -5,5 +5,11 @@
       "authorEmail": "lazaro.costa.carles@gmail.com",
       "authorUrl": "https://carleslc.me"
     }
+  },
+  "generator-readteractive": {
+    "promptValues": {
+      "author": "Author",
+      "language": "Catalan"
+    }
   }
 }

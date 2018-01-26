@@ -1,0 +1,5 @@
+title: <%= title %>
+author: <%= author %>
+language: <%= language %>
+cover-image: cover.png
+description: <%= description %>

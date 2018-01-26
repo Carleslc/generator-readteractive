@@ -4,45 +4,51 @@ const chalk = require('chalk');
 const yosay = require('yosay');
 
 module.exports = class extends Generator {
+
+  constructor(args, opts) {
+    super(args, opts);
+
+    this.execute = function(name) {
+      let self = this;
+      function getFeature() {
+        switch (name) {
+          case 'Create a new book':
+            return '../book';
+          case 'Create a new chapter':
+            return '../chapter';
+          case 'Rename a chapter ID':
+            return '../chapter';
+          case 'Book graph':
+            return '../graph';
+        };
+      }
+      this.composeWith(require.resolve(getFeature()));
+    };
+  }
+
   prompting() {
-    // Have Yeoman greet the user.
     this.log(yosay(
       "Let's scaffold some " + chalk.red('Readteractive') + " books!"
     ));
 
-    const prompts = [{
-      type: 'confirm',
-      name: 'someAnswer',
-      message: 'Would you like to enable this option?',
-      default: true
+    const feature_select = [{
+      type: 'list',
+      name: 'feature',
+      message: 'What do you want to do?',
+      choices: [
+        'Create a new book',
+        'Create a new chapter',
+        'Rename a chapter ID',
+        'Book graph'
+      ]
     }];
 
-    return this.prompt(prompts).then(props => {
-      // To access props later use this.props.someAnswer;
-      this.props = props;
+    return this.prompt(feature_select).then(props => {
+      this.execute(props.feature);
     });
   }
 
-  writing() {
-    this.fs.copy(
-      this.templatePath('dummyfile.txt'),
-      this.destinationPath('dummyfile.txt')
-    );
-  }
-
-  install() {
-    this.installDependencies();
-  }
-
-  chapter() {
-    this.log('chapter just run');
-  }
-
-  graph() {
-    this.log('graph just run');
-  }
-
-  rename() {
-    this.log('rename just run');
+  end() {
+    this.log(chalk.yellow('Happy writing! ') + chalk.red('See you soon!'));
   }
 };
