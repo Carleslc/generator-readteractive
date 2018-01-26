@@ -2,8 +2,6 @@
 
 ![CLI](https://img.shields.io/badge/CLI-readteractive--generator-blue.svg)
 
-> A yeoman generator for scaffolding Readteractive books.
-
 We provide a _command line interface_ to easily generate your project doing **scaffolding**, so you do not need to remember the syntax of each file and you can just **focus on writing**.
 
 The [Readteractive structure](https://github.com/Carleslc/Readteractive/readteractive-structure) and files can be automatically generated using this CLI for your custom book.
@@ -37,20 +35,34 @@ Generate a new book.
 yo readteractive:book
 ```
 
-### TODO
+### Chapter scaffolding
 
 ![In development](https://img.shields.io/badge/status-in%20development-red.svg)
 
-- Chapter scaffolding: Generate a new chapter.
-- Build: Builds your book 
-- Chapter ID rename: Rename a chapter ID.
-- Book graph visualization: Shows a graph of your book with current chapters and the links between them.
+Generate a new chapter or rename an existing chapter identifier (updating all links on all referenced chapters).
 
-[npm-image]: https://badge.fury.io/js/generator-readteractive.svg
-[npm-url]: https://npmjs.org/package/generator-readteractive
-[travis-image]: https://travis-ci.org/Carleslc/generator-readteractive.svg?branch=master
-[travis-url]: https://travis-ci.org/Carleslc/generator-readteractive
-[daviddm-image]: https://david-dm.org/Carleslc/generator-readteractive.svg?theme=shields.io
-[daviddm-url]: https://david-dm.org/Carleslc/generator-readteractive
-[coveralls-image]: https://coveralls.io/repos/Carleslc/generator-readteractive/badge.svg
-[coveralls-url]: https://coveralls.io/r/Carleslc/generator-readteractive
+```
+yo readteractive:chapter
+```
+
+### Build your book
+
+![In development](https://img.shields.io/badge/status-in%20development-red.svg)
+
+Building your book is easier with a wizard.
+
+```
+yo readteractive:build
+```
+
+### Graph visualization
+
+![In development](https://img.shields.io/badge/status-in%20development-red.svg)
+
+Shows a graph of your book with current chapters and the links between them.
+
+```
+yo readteractive:graph
+```
+
+> That's all! Enjoy!
