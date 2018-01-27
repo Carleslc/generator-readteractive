@@ -1,3 +1,4 @@
+'use strict';
 const Generator = require('yeoman-generator');
 const path = require('path');
 const lodash = require('lodash');
@@ -9,7 +10,8 @@ module.exports = class extends Generator {
   prompting() {
     this.log("Ok, let's create a new amazing book.");
 
-    const book = [{
+    const book = [
+      {
         type: 'input',
         name: 'author',
         message: 'What is your name?',
@@ -46,30 +48,29 @@ module.exports = class extends Generator {
   writing() {
     this.book.id = lodash.kebabCase(this.book.title);
     if (path.basename(this.destinationPath()) !== this.book.id) {
-      this.log('I\'ll automatically create your book inside a folder named ' + this.book.id + '.');
+      this.log(
+        `I'll automatically create your book inside a folder named ${this.book.id}.`
+      );
       mkdirp(this.book.id);
       this.destinationRoot(this.destinationPath(this.book.id));
     }
 
-    this.fs.copyTpl(
-      this.templatePath('_meta.yml'),
-      this.destinationPath('_meta.yml'),
-      {
-        title: this.book.title,
-        author: this.book.author,
-        language: ISO_639_1.getCode(this.book.language),
-        description: this.book.description
-      }
-    );
+    this.fs.copyTpl(this.templatePath('_meta.yml'), this.destinationPath('_meta.yml'), {
+      title: this.book.title,
+      author: this.book.author,
+      language: ISO_639_1.getCode(this.book.language),
+      description: this.book.description
+    });
 
-    this.fs.copy(
-      this.templatePath('cover.png'),
-      this.destinationPath('cover.png')
-    );
+    this.fs.copy(this.templatePath('cover.png'), this.destinationPath('cover.png'));
   }
 
   end() {
-    this.log(chalk.blue('If this is your first book remember to install Python 3, Make and Pandoc'));
-    this.log(chalk.blue('Build with: ') + chalk.bold.blue('make BOOK=' + this.book.id));
+    this.log(
+      chalk.blue(
+        'If this is your first book remember to install Python 3, Make and Pandoc'
+      )
+    );
+    this.log(chalk.blue('Build with: ') + chalk.bold.blue('yo readteractive:build'));
   }
-}
+};

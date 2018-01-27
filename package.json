@@ -8,9 +8,7 @@
     "email": "lazaro.costa.carles@gmail.com",
     "url": "https://carleslc.me"
   },
-  "files": [
-    "generators"
-  ],
+  "files": ["generators"],
   "main": "generators/index.js",
   "keywords": [
     "yeoman-generator",
@@ -39,7 +37,7 @@
   "dependencies": {
     "chalk": "^2.1.0",
     "iso-639-1": "^2.0.3",
-    "yeoman-generator": "^2.0.1",
+    "yeoman-generator": "^2.0.2",
     "yosay": "^2.0.1"
   },
   "jest": {
@@ -52,20 +50,11 @@
     "test": "jest"
   },
   "lint-staged": {
-    "*.js": [
-      "eslint --fix",
-      "git add"
-    ],
-    "*.json": [
-      "prettier --write",
-      "git add"
-    ]
+    "*.js": ["eslint --fix", "git add"],
+    "*.json": ["prettier --write", "git add"]
   },
   "eslintConfig": {
-    "extends": [
-      "xo",
-      "prettier"
-    ],
+    "extends": ["xo", "prettier"],
     "env": {
       "jest": true,
       "node": true
@@ -79,9 +68,7 @@
         }
       ]
     },
-    "plugins": [
-      "prettier"
-    ]
+    "plugins": ["prettier"]
   },
   "repository": "https://github.com/carleslc/readteractive-generator.git",
   "license": "MIT"

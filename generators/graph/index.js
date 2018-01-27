@@ -1,3 +1,4 @@
+'use strict';
 const Generator = require('yeoman-generator');
 
 module.exports = class extends Generator {
@@ -5,7 +6,5 @@ module.exports = class extends Generator {
     this.log("Ok, let's visualize the narrative branches graph.");
   }
 
-  writing() {
-
-  }
-}
+  writing() {}
+};

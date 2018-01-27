@@ -47,8 +47,6 @@ yo readteractive:chapter
 
 ### Build your book
 
-![In development](https://img.shields.io/badge/status-in%20development-red.svg)
-
 Building your book is easier with a wizard.
 
 ```
