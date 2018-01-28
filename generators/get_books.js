@@ -14,8 +14,9 @@ function isNatural(s) {
   return /^\d+$/.test(s);
 }
 
-function orderSpecified(id) {
-  let idParts = kebabCase(id).split('-', 2);
+function orderSpecified(id, limit) {
+  limit = limit || 1;
+  let idParts = kebabCase(id).split('-', limit);
   return { isOrderGiven: isNatural(idParts[0]), idParts: idParts };
 }
 
@@ -25,7 +26,7 @@ function getOrder(chapter) {
 }
 
 function withoutOrder(chapter) {
-  let { isOrderGiven, idParts } = orderSpecified(chapter);
+  let { isOrderGiven, idParts } = orderSpecified(chapter, 2);
   return isOrderGiven ? idParts[1] : chapter;
 }
 
@@ -44,7 +45,11 @@ module.exports = {
     return fs.readdirSync(bookpath).filter(file => isDirectory(file));
   },
   chapterOrder(mfs, bookpath) {
-    return Math.max(...this.listChapters(bookpath).map(chapter => getOrder(chapter))) + 1;
+    let chapters = this.listChapters(bookpath);
+    if (chapters.length === 0) {
+      return 0;
+    }
+    return Math.max(...chapters.map(chapter => getOrder(chapter))) + 1;
   },
   renameLinks(mfs, bookpath, oldId, newId) {
     let oldRegex = new RegExp(`\\[\\s*(${withoutOrder(oldId)}|${oldId})\\s*\\]`, 'g');

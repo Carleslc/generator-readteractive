@@ -61,7 +61,7 @@ module.exports = class extends Generator {
       if (isOrderGiven && idParts.length === 1) {
         return id;
       }
-      return getOrder() + '_' + id;
+      return getOrder() + '-' + id;
     }
 
     function defaultId(props) {
