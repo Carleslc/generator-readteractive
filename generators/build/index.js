@@ -23,7 +23,14 @@ function exec(self, cmdArgs, then) {
     self.log(chalk.red(data.toString('utf8')));
   });
 
-  make.on('close', then);
+  make.on('close', code => {
+    if (code === 0) {
+      // No error
+      then();
+    } else {
+      self.log(chalk.yellow('Warnings or errors detected.'));
+    }
+  });
 }
 
 module.exports = class extends Generator {
@@ -175,5 +182,9 @@ module.exports = class extends Generator {
     if (this.build) {
       formatConsumer();
     }
+  }
+
+  end() {
+    this.log(chalk.yellow('Happy writing! ') + chalk.red('See you soon!'));
   }
 };

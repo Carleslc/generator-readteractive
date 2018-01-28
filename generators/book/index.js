@@ -6,6 +6,14 @@ const mkdirp = require('mkdirp');
 const chalk = require('chalk');
 const ISO_639_1 = require('iso-639-1');
 
+function kebab(s) {
+  return lodash.kebabCase(s);
+}
+
+function defaultId(props) {
+  return kebab(props.title);
+}
+
 module.exports = class extends Generator {
   prompting() {
     this.log("Ok, let's create a new amazing book.");
@@ -23,6 +31,13 @@ module.exports = class extends Generator {
         name: 'title',
         message: 'What is the title of your book?',
         default: 'My Book'
+      },
+      {
+        type: 'input',
+        name: 'id',
+        message: 'Set a book identifier',
+        default: defaultId,
+        filter: kebab
       },
       {
         type: 'list',
@@ -46,7 +61,6 @@ module.exports = class extends Generator {
   }
 
   writing() {
-    this.book.id = lodash.kebabCase(this.book.title);
     if (path.basename(this.destinationPath()) !== this.book.id) {
       this.log(
         `I'll automatically create your book inside a folder named ${this.book.id}.`
@@ -72,5 +86,6 @@ module.exports = class extends Generator {
       )
     );
     this.log(chalk.blue('Build with: ') + chalk.bold.blue('yo readteractive:build'));
+    this.log(chalk.yellow('Happy writing! ') + chalk.red('See you soon!'));
   }
 };

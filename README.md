@@ -37,8 +37,6 @@ yo readteractive:book
 
 ### Chapter scaffolding
 
-![In development](https://img.shields.io/badge/status-in%20development-red.svg)
-
 Generate a new chapter or rename an existing chapter identifier (updating all links on all referenced chapters).
 
 ```

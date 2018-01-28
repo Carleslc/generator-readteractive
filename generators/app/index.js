@@ -12,9 +12,7 @@ module.exports = class extends Generator {
         switch (name) {
           case 'Create a new book':
             return '../book';
-          case 'Create a new chapter':
-            return '../chapter';
-          case 'Rename a chapter ID':
+          case 'Create or rename a chapter':
             return '../chapter';
           case 'Build a book':
             return '../build';
@@ -36,20 +34,16 @@ module.exports = class extends Generator {
         message: 'What do you want to do?',
         choices: [
           'Create a new book',
-          'Create a new chapter',
-          'Rename a chapter ID',
+          'Create or rename a chapter',
           'Build a book',
           'Book graph'
-        ]
+        ],
+        store: true
       }
     ];
 
     return this.prompt(featureSelect).then(props => {
       this.execute(props.feature);
     });
-  }
-
-  end() {
-    this.log(chalk.yellow('Happy writing! ') + chalk.red('See you soon!'));
   }
 };
