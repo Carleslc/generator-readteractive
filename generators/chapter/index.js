@@ -190,7 +190,15 @@ module.exports = class extends Generator {
         }
       );
 
-      this.fs.copy(this.templatePath('chapter.md'), chapterContentPath(self.chapter.id));
+      this.fs.copyTpl(
+        this.templatePath('chapter.md'),
+        chapterContentPath(self.chapter.id),
+        {
+          id: this.chapter.id
+        }
+      );
+
+      this.fs.copy(this.templatePath('image.jpg'), this.destinationPath('image.jpg'));
     }
   }
 
