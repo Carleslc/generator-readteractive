@@ -46,11 +46,19 @@ module.exports = class extends Generator {
       return !books.orderSpecified(props.id).isOrderGiven;
     }
 
-    function idFilter(id) {
+    function idFilter(id, oldId) {
       id = lodash.kebabCase(id);
       let { isOrderGiven, idParts } = books.orderSpecified(id);
 
       function getOrder() {
+        if (oldId && !isOrderGiven) {
+          let orderOld = books.orderSpecified(oldId);
+          let isOldOrderGiven = orderOld.isOrderGiven;
+          let oldIdParts = orderOld.idParts;
+          if (isOldOrderGiven) {
+            return oldIdParts[0];
+          }
+        }
         return isOrderGiven ? idParts[0] : books.chapterOrder(self.fs, bookpath);
       }
 
@@ -61,6 +69,7 @@ module.exports = class extends Generator {
       if (isOrderGiven && idParts.length === 1) {
         return id;
       }
+
       return getOrder() + '-' + id;
     }
 
@@ -128,7 +137,7 @@ module.exports = class extends Generator {
       this.chapter = props;
 
       if (this.chapter.order) {
-        this.chapter.id = idFilter(this.chapter.id);
+        this.chapter.id = idFilter(this.chapter.id, this.chapter.old);
       }
     });
   }
@@ -164,11 +173,10 @@ module.exports = class extends Generator {
         );
 
         let newReference = books.withoutOrder(this.chapter.id);
+        let oldReference = books.withoutOrder(this.chapter.old);
         this.log(
           chalk.yellow(
-            `I'll update links on your chapters pointing to ${
-              this.chapter.old
-            }, now will reference to ${newReference}.`
+            `I'll update links on your chapters pointing to ${oldReference}, now will reference to ${newReference}.`
           )
         );
         this.destinationRoot(bookPath);

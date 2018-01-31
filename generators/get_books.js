@@ -14,10 +14,14 @@ function isNatural(s) {
   return /^\d+$/.test(s);
 }
 
-function orderSpecified(id, limit) {
-  limit = limit || 1;
-  let idParts = kebabCase(id).split('-', limit);
-  return { isOrderGiven: isNatural(idParts[0]), idParts: idParts };
+function orderSpecified(id) {
+  let kebabId = kebabCase(id);
+  let allParts = kebabId.split('-');
+  let isOrderGiven = isNatural(allParts[0]);
+  let idParts = isOrderGiven
+    ? [allParts[0], allParts.slice(1).join('-')]
+    : [allParts.join('-')];
+  return { isOrderGiven: isOrderGiven, idParts: idParts };
 }
 
 function getOrder(chapter) {
@@ -26,7 +30,7 @@ function getOrder(chapter) {
 }
 
 function withoutOrder(chapter) {
-  let { isOrderGiven, idParts } = orderSpecified(chapter, 2);
+  let { isOrderGiven, idParts } = orderSpecified(chapter);
   return isOrderGiven ? idParts[1] : chapter;
 }
 
