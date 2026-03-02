@@ -7,7 +7,7 @@ module.exports = class extends Generator {
   constructor(args, opts) {
     super(args, opts);
 
-    this.execute = function(name) {
+    this.execute = function (name) {
       function getFeature() {
         switch (name) {
           case 'Create a new book':
@@ -20,6 +20,7 @@ module.exports = class extends Generator {
             return '../graph';
         }
       }
+
       this.composeWith(require.resolve(getFeature()));
     };
   }
@@ -29,20 +30,20 @@ module.exports = class extends Generator {
 
     const featureSelect = [
       {
-        type: 'list',
+        type: 'select',
         name: 'feature',
         message: 'What do you want to do?',
         choices: [
           'Create a new book',
           'Create or rename a chapter',
           'Build a book',
-          'Book graph'
+          'Book graph',
         ],
-        store: true
-      }
+        store: true,
+      },
     ];
 
-    return this.prompt(featureSelect).then(props => {
+    return this.prompt(featureSelect).then((props) => {
       this.execute(props.feature);
     });
   }

@@ -1,36 +1,42 @@
 'use strict';
 const Generator = require('yeoman-generator');
-const books = require('../get_books');
+const books = require('../../utils/books');
+const { farewell } = require('../../utils/messages');
 const lodash = require('lodash');
-const mkdirp = require('mkdirp');
+const fs = require('fs');
 const chalk = require('chalk');
 
-var bookpath = null;
-var isRename = null;
+let bookpath = null;
+let isRename = null;
+let hasChapters = true;
 
 module.exports = class extends Generator {
+  constructor(args, opts) {
+    super(args, opts, { customInstallTask: true });
+  }
+
   prompting() {
-    if (!books.isReadteractive(this.fs, this.destinationPath())) {
+    if (!books.isReadteractive(this.destinationPath())) {
       this.log(chalk.red('You are not in Readteractive folder!'));
       return;
     }
 
-    let availableBooks = books.list(this.fs, this.destinationPath());
+    const availableBooks = books.list(this.destinationPath());
 
     if (availableBooks.length === 0) {
       this.log(
         chalk.red(
           'There are no Readteractive books available in folder ' +
             this.destinationPath() +
-            '!'
-        )
+            '!',
+        ),
       );
       return;
     }
 
     this.log('Ok, the story must continue.');
 
-    var self = this;
+    const self = this;
 
     function setBookPath(props) {
       bookpath = self.destinationPath(props.book);
@@ -48,18 +54,19 @@ module.exports = class extends Generator {
 
     function idFilter(id, oldId) {
       id = lodash.kebabCase(id);
-      let { isOrderGiven, idParts } = books.orderSpecified(id);
+      const { isOrderGiven, idParts } = books.orderSpecified(id);
 
       function getOrder() {
         if (oldId && !isOrderGiven) {
-          let orderOld = books.orderSpecified(oldId);
-          let isOldOrderGiven = orderOld.isOrderGiven;
-          let oldIdParts = orderOld.idParts;
+          const orderOld = books.orderSpecified(oldId);
+          const isOldOrderGiven = orderOld.isOrderGiven;
+          const oldIdParts = orderOld.idParts;
           if (isOldOrderGiven) {
             return oldIdParts[0];
           }
         }
-        return isOrderGiven ? idParts[0] : books.chapterOrder(self.fs, bookpath);
+
+        return isOrderGiven ? idParts[0] : books.chapterOrder(bookpath);
       }
 
       if (isOrderGiven && idParts.length > 1) {
@@ -79,7 +86,18 @@ module.exports = class extends Generator {
 
     function setBookPathAndRename(props) {
       setBookPath(props);
-      return isRename;
+
+      if (isRename) {
+        hasChapters = books.listChapters(bookpath).length > 0;
+
+        if (!hasChapters) {
+          self.log(chalk.red('This book has no chapters to rename.'));
+        }
+
+        return hasChapters;
+      }
+
+      return false;
     }
 
     function availableChapters() {
@@ -88,52 +106,53 @@ module.exports = class extends Generator {
 
     const chapter = [
       {
-        type: 'list',
+        type: 'select',
         name: 'feature',
         message: 'Select an option',
         choices: ['Create a new chapter', 'Rename a chapter identifier'],
         default: 'Create a new chapter',
-        store: true
+        store: true,
       },
       {
-        type: 'list',
+        type: 'select',
         name: 'book',
         message: 'To what book does the chapter belong?',
         choices: availableBooks,
-        store: true
+        store: true,
       },
       {
         type: 'input',
         name: 'title',
         when: newChapter,
         message: 'What is the title of your chapter?',
-        default: 'My Chapter'
+        default: 'My Chapter',
       },
       {
-        type: 'list',
+        type: 'select',
         name: 'old',
         when: setBookPathAndRename,
         message: 'Select the chapter to rename',
-        choices: availableChapters
+        choices: availableChapters,
       },
       {
         type: 'input',
         name: 'id',
+        when: () => !isRename || hasChapters,
         message: 'Set a chapter identifier',
         default: defaultId,
-        filter: lodash.kebabCase
+        filter: lodash.kebabCase,
       },
       {
         type: 'confirm',
         name: 'order',
         message:
           'You have not specified a chapter order, do you want to add it automatically?',
-        when: orderNotSpecified,
-        default: true
-      }
+        when: (props) => (!isRename || hasChapters) && orderNotSpecified(props),
+        default: true,
+      },
     ];
 
-    return this.prompt(chapter).then(props => {
+    return this.prompt(chapter).then((props) => {
       this.chapter = props;
 
       if (this.chapter.order) {
@@ -143,7 +162,9 @@ module.exports = class extends Generator {
   }
 
   writing() {
-    var self = this;
+    if (!this.chapter || !this.chapter.id) return;
+
+    const self = this;
 
     function chapterContentPath(id) {
       return self.destinationPath(`${id}.md`);
@@ -153,57 +174,76 @@ module.exports = class extends Generator {
       return self.destinationPath(`${id}.yml`);
     }
 
-    let bookPath = this.destinationPath();
-    let chapterPath = this.destinationPath(this.chapter.id);
-
-    mkdirp(this.chapter.id);
+    const bookPath = this.destinationPath();
+    const chapterPath = this.destinationPath(this.chapter.id);
 
     if (isRename) {
       if (this.chapter.old !== this.chapter.id) {
-        this.fs.move(this.destinationPath(this.chapter.old), chapterPath);
-        this.destinationRoot(chapterPath);
+        const newName = books.withoutOrder(this.chapter.id);
+        const conflict = books
+          .listChapters(bookPath)
+          .find((ch) => ch !== this.chapter.old && books.withoutOrder(ch) === newName);
 
-        this.fs.move(
-          chapterTitlePath(this.chapter.old),
-          chapterTitlePath(this.chapter.id)
+        if (conflict) {
+          this.log(chalk.red(`Cannot rename: chapter "${conflict}" already exists.`));
+          return;
+        }
+
+        fs.renameSync(this.destinationPath(this.chapter.old), chapterPath);
+        fs.renameSync(
+          this.destinationPath(this.chapter.id, `${this.chapter.old}.yml`),
+          this.destinationPath(this.chapter.id, `${this.chapter.id}.yml`),
         );
-        this.fs.move(
-          chapterContentPath(this.chapter.old),
-          chapterContentPath(this.chapter.id)
+        fs.renameSync(
+          this.destinationPath(this.chapter.id, `${this.chapter.old}.md`),
+          this.destinationPath(this.chapter.id, `${this.chapter.id}.md`),
         );
 
-        let newReference = books.withoutOrder(this.chapter.id);
-        let oldReference = books.withoutOrder(this.chapter.old);
+        const newReference = books.withoutOrder(this.chapter.id);
+        const oldReference = books.withoutOrder(this.chapter.old);
         this.log(
           chalk.yellow(
-            `I'll update links on your chapters pointing to ${oldReference}, now will reference to ${newReference}.`
-          )
+            `I'll update links on your chapters pointing to ${oldReference}, now will reference to ${newReference}.`,
+          ),
         );
-        this.destinationRoot(bookPath);
-        books.renameLinks(this.fs, bookPath, this.chapter.old, this.chapter.id);
+        const results = books.renameLinks(bookPath, this.chapter.old, this.chapter.id);
+        const lines = results.flatMap(({ chapter, texts }) =>
+          texts.map(
+            (text) =>
+              chalk.blue(`  ${chapter}: `) +
+              chalk.dim(`"${text}"`) +
+              ' -> ' +
+              chalk.red.strikethrough(oldReference) +
+              ' ' +
+              chalk.bold(newReference),
+          ),
+        );
+        for (const line of lines) this.log(line);
+        if (lines.length === 0) this.log(chalk.dim('  No links to update.'));
       }
     } else {
       this.log(
         chalk.yellow(
-          `I'll automatically create your chapter inside folder ${chapterPath}.`
-        )
+          `I'll automatically create your chapter inside folder ${chapterPath}.`,
+        ),
       );
+      fs.mkdirSync(chapterPath, { recursive: true });
       this.destinationRoot(chapterPath);
 
       this.fs.copyTpl(
         this.templatePath('chapter.yml'),
         chapterTitlePath(self.chapter.id),
         {
-          title: this.chapter.title
-        }
+          title: this.chapter.title,
+        },
       );
 
       this.fs.copyTpl(
         this.templatePath('chapter.md'),
         chapterContentPath(self.chapter.id),
         {
-          id: this.chapter.id
-        }
+          id: this.chapter.id,
+        },
       );
 
       this.fs.copy(this.templatePath('image.jpg'), this.destinationPath('image.jpg'));
@@ -211,6 +251,6 @@ module.exports = class extends Generator {
   }
 
   end() {
-    this.log(chalk.yellow('Happy writing! ') + chalk.red('See you soon!'));
+    this.log(farewell);
   }
 };

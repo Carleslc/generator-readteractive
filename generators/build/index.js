@@ -1,54 +1,59 @@
 'use strict';
 const Generator = require('yeoman-generator');
-const books = require('../get_books');
+const books = require('../../utils/books');
+const { farewell } = require('../../utils/messages');
 const chalk = require('chalk');
 const { spawn } = require('child_process');
 
 function validateMargin(margin) {
-  let valid = /^\d+(cm|in)$/.test(margin);
+  const valid = /^\d+(cm|in)$/.test(margin);
   if (!valid) {
     return 'Incorrect format (digit followed by cm or in)';
   }
+
   return true;
 }
 
 function exec(self, cmdArgs, then) {
   const make = spawn(cmdArgs[0], cmdArgs.slice(1));
 
-  make.stdout.on('data', data => {
+  make.stdout.on('data', (data) => {
     self.log(data.toString('utf8'));
   });
 
-  make.stderr.on('data', data => {
+  make.stderr.on('data', (data) => {
     self.log(chalk.red(data.toString('utf8')));
   });
 
-  make.on('close', code => {
-    if (code === 0) {
-      // No error
-      then();
-    } else {
+  make.on('close', (code) => {
+    if (code !== 0) {
       self.log(chalk.yellow('Warnings or errors detected.'));
     }
+
+    then();
   });
 }
 
 module.exports = class extends Generator {
+  constructor(args, opts) {
+    super(args, opts, { customInstallTask: true });
+  }
+
   prompting() {
-    if (!books.isReadteractive(this.fs, this.destinationPath())) {
+    if (!books.isReadteractive(this.destinationPath())) {
       this.log(chalk.red('You are not in Readteractive folder!'));
       return;
     }
 
-    let availableBooks = books.list(this.fs, this.destinationPath());
+    const availableBooks = books.list(this.destinationPath());
 
     if (availableBooks.length === 0) {
       this.log(
         chalk.red(
           'There are no Readteractive books available in folder ' +
             this.destinationPath() +
-            '!'
-        )
+            '!',
+        ),
       );
       return;
     }
@@ -75,18 +80,18 @@ module.exports = class extends Generator {
 
     this.log(
       chalk.blue(
-        'If this is your first book remember to have installed Python 3, Make and Pandoc and if you want to build Kindle MOBI e-books install Kindlegen too.\nCancel with Ctrl+C'
-      )
+        'If this is your first book remember to have installed Python 3, Make and Pandoc and if you want to build Kindle MOBI e-books install Kindlegen too.\nCancel with Ctrl+C',
+      ),
     );
     this.log("Ok, let's build your awesome book.");
 
     const build = [
       {
-        type: 'list',
+        type: 'select',
         name: 'book',
         message: 'What book do you want to build?',
         choices: availableBooks,
-        store: true
+        store: true,
       },
       {
         type: 'checkbox',
@@ -94,25 +99,25 @@ module.exports = class extends Generator {
         message: 'In which formats are you interested?',
         choices: ['html', 'pdf', 'epub', 'mobi'],
         default: ['html', 'pdf', 'epub'],
-        store: true
+        store: true,
       },
       {
-        type: 'list',
+        type: 'select',
         name: 'scroll',
         when: html,
         message: 'Which showing chapters way do you prefer for HTML format?',
         choices: [
           'Show only the current chapter and hide others',
-          'Keep all opened chapters available with scroll'
+          'Keep all opened chapters available with scroll',
         ],
-        store: true
+        store: true,
       },
       {
         type: 'confirm',
         name: 'printed',
         when: isPrintable,
         message: 'Will you print this book?',
-        default: false
+        default: false,
       },
       {
         type: 'input',
@@ -121,16 +126,18 @@ module.exports = class extends Generator {
         message: 'How much margin do you want for PDF format?',
         default: '3cm',
         validate: validateMargin,
-        store: true
-      }
+        store: true,
+      },
     ];
 
-    return this.prompt(build).then(props => {
+    return this.prompt(build).then((props) => {
       this.build = props;
 
       if (mobi(props) && !epub(props)) {
         this.log(
-          chalk.yellow("Mobi converts from epub format, so I'll build epub format first.")
+          chalk.yellow(
+            "Mobi converts from epub format, so I'll build epub format first.",
+          ),
         );
         this.build.formats.unshift('epub');
       }
@@ -138,7 +145,7 @@ module.exports = class extends Generator {
   }
 
   writing() {
-    let self = this;
+    const self = this;
 
     function yesNo(bool) {
       return bool ? 'yes' : 'no';
@@ -149,7 +156,7 @@ module.exports = class extends Generator {
     }
 
     function make(format) {
-      var command = 'make ' + format;
+      let command = 'make ' + format;
 
       function append(option, value, formats) {
         if (value !== undefined && (formats === undefined || formats.includes(format))) {
@@ -165,26 +172,26 @@ module.exports = class extends Generator {
       return command.split(' ');
     }
 
-    function formatConsumer() {
-      let formats = self.build.formats.slice();
+    if (!this.build) return;
 
-      function next() {
-        let format = formats.shift();
-        if (format !== undefined) {
-          self.log(chalk.blue(`Building ${chalk.blue.bold(format)}`));
-          exec(self, make(format), next);
-        }
+    const done = this.async();
+    const formats = this.build.formats.slice();
+
+    function next() {
+      const format = formats.shift();
+      if (format === undefined) {
+        done();
+        return;
       }
 
-      next();
+      self.log(chalk.blue(`Building ${chalk.blue.bold(format)}`));
+      exec(self, make(format), next);
     }
 
-    if (this.build) {
-      formatConsumer();
-    }
+    next();
   }
 
   end() {
-    this.log(chalk.yellow('Happy writing! ') + chalk.red('See you soon!'));
+    this.log(farewell);
   }
 };

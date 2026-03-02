@@ -2,6 +2,8 @@
 
 ![CLI](https://img.shields.io/badge/CLI-readteractive--generator-blue.svg)
 
+A yeoman generator for scaffolding [Readteractive](https://github.com/Carleslc/Readteractive/) interactive books.
+
 We provide a _command line interface_ to easily generate your project doing **scaffolding**, so you do not need to remember the syntax of each file and you can just **focus on writing**.
 
 The [Readteractive structure](https://github.com/Carleslc/Readteractive/#readteractive-structure) and files can be automatically generated using this CLI for your custom book.
@@ -19,7 +21,7 @@ npm install -g yo
 npm install -g generator-readteractive
 ```
 
-Then run the wizard and it will guide you:
+Then run the wizard inside the [Readteractive](https://github.com/Carleslc/Readteractive/#readteractive-structure) folder and it will guide you:
 
 ```bash
 yo readteractive
@@ -53,12 +55,12 @@ yo readteractive:build
 
 ### Graph visualization
 
-![In development](https://img.shields.io/badge/status-in%20development-red.svg)
-
 Shows a graph of your book with current chapters and the links between them.
 
 ```
 yo readteractive:graph
 ```
+
+This displays the narrative branches in the terminal and generates a [Graphviz](https://graphviz.org/) DOT file (`graph.dot`). If Graphviz is installed, it also renders a `graph.png` image automatically.
 
 > That's all! Enjoy!
